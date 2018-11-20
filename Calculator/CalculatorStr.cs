@@ -1,50 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace CalculatorTest
+namespace Calculator
 {
-    [TestClass]
-    public class Calculator
+    public class CalculatorStr
     {
-        [TestMethod]
-        public void test_calculator_1()
-        {
-            var result = Calculate(getInput1());
-            Assert.IsTrue(result == 94);
-        }
-        [TestMethod]
-        public void test_caluculator_2()
-        {
-            var result = Calculate(getInput2());
-            Assert.IsTrue(result == 15);
-        }
-        [TestMethod]
-        public void test_calculator_3()
-        {
-            var result = Calculate(getInput3());
-            Assert.IsTrue(result == 8);
-        }
-        public string getInput()
-        {
-            return "(3+2)-4*6/2";
-        }
-        public string getInput1()
-        {
-            return "(22*2)+50";
-        }
-        public string getInput2()
-        {
-            return "((2*3+12)/2)";
-        }
-        public string getInput3()
-        {
-            return "(10-5+3/2*2)";
-        }
-
         public double Calculate(string input)
         {
-            return Calculate(sortData(splitData(input)));
+            try
+            {
+                return Calculate(sortDataPMFirst(splitData(input)));
+            }
+            catch(Exception ex)
+            {
+                return double.NaN;
+            }
+            finally
+            {
+                
+            }
+            
 
         }
         public double Calculate(string[] data)
@@ -52,7 +30,7 @@ namespace CalculatorTest
             var list_data = new List<string>();
             list_data.AddRange(data);
 
-            while (list_data.Count>1)
+            while (list_data.Count > 1)
             {
                 var i = list_data.FindIndex(key => operation.oper.Contains(key));
                 if (i > 1)
@@ -66,7 +44,7 @@ namespace CalculatorTest
             }
             return Convert.ToDouble(list_data[0]);
         }
-        public string unitCalculation(string temp_a,string temp_b,string temp_oper)
+        public string unitCalculation(string temp_a, string temp_b, string temp_oper)
         {
             var a = Convert.ToDouble(temp_a);
             var b = Convert.ToDouble(temp_b);
@@ -77,29 +55,22 @@ namespace CalculatorTest
             else if (temp_oper == operation.multiple) result = multiple(a, b);
             return result.ToString();
         }
-        [TestMethod]
-        public void test_sort_data()
-        {   //“(10-5+3/2*2)” 
-            var input = new string[] { "(", "10", "-", "5", "+", "3", "/", "2", "*", "2", ")" };
-            var result = sortData(input);
-            //105-3+22/*
-            Assert.IsTrue(result[7] == "/");
-        }
-        private string[] sortData(string[] data)
+        #region Clean and prepair data
+        private string[] sortDataPMFirst(string[] data)
         {
             var list_num = new List<string>();
             var list_oper = new List<string>();
 
-            for(int i = 0; i < data.Length; i++)
+            for (int i = 0; i < data.Length; i++)
             {
                 var s = data[i];
-                if(s==operation.divide||
+                if (s == operation.divide ||
                     s == operation.multiple)
                 {
                     list_oper.Add(s);
                 }
-                else if (s == operation.plus||
-                    s==operation.minus)
+                else if (s == operation.plus ||
+                    s == operation.minus)
                 {
                     //insert closed blanket to let * / operation to be after num
                     list_oper.Add(s);
@@ -116,7 +87,7 @@ namespace CalculatorTest
                 else if (s == operation.close)
                 {
                     addOperInNum(ref list_oper, ref list_num);
-                    
+
                 }
                 else
                 {
@@ -124,14 +95,14 @@ namespace CalculatorTest
                 }
 
             }
-            
+
             addOperInNum(ref list_oper, ref list_num);
 
             return list_num.ToArray();
         }
 
         private void addOperInNum(ref List<string> list_oper, ref List<string> list_num)
-        { 
+        {
             // let divide be before multiple
 
             while (list_oper.Count > 0)
@@ -155,15 +126,6 @@ namespace CalculatorTest
             }
         }
 
-        [TestMethod]
-        public void test_split_data()
-        {
-            var input = getInput();
-            var output = splitData(input);
-            Assert.IsTrue(output[6] == "4");
-
-        }
-        
         private string[] splitData(string data)
         {
             data = data.Replace("+", " + ");
@@ -175,7 +137,7 @@ namespace CalculatorTest
 
             return data.Split();
         }
-
+        #endregion
         #region pop array
         public string popFirst(ref List<string> list)
         {
@@ -186,12 +148,12 @@ namespace CalculatorTest
             var index = list.Count - 1;
             return pop(ref list, index);
         }
-        public string popAt(ref List<string> list,int index)
+        public string popAt(ref List<string> list, int index)
         {
             return pop(ref list, index);
 
         }
-        private string pop(ref List<string> list,int index)
+        private string pop(ref List<string> list, int index)
         {
             var temp = list[index];
             list.RemoveAt(index);
@@ -227,6 +189,5 @@ namespace CalculatorTest
             public const string oper = "+-*/";
         }
         #endregion
-
     }
 }
